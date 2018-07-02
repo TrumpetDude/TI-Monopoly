@@ -1,0 +1,125 @@
+Lbl O
+ClrHome
+Menu("  INFORMATION   ","PLAYER",PL,"PROPERTY",PR,"DONE",R
+Lbl PL
+Asm(prgmAMNALPHA
+Input "PLAYER:         ",Str4
+DelVar VinString(Str3,Str4->V
+ClrHome
+If not(V
+	Pause "PLAYER NOT FOUND
+If not(V
+	Goto O
+1+(inString(Str3,Str4)-2)/10->V
+If ~.5=[A](2,V
+	Pause "BANKRUPT!
+If ~.5=[A](2,V
+	Goto O
+ClrHome
+Disp sub(Str3,10(V-1)+2,10),"CURRENT SPACE:",sub(Str1,16[A](1,V)-15,16),"MONEY:"
+Output(4,7,[A](2,V
+Disp sub("NOT         1 TURN LEFT 2 TURNS LEFT3 TURNS LEFT",12*[A](3,V)+1,12
+Pause "IN JAIL
+ClrHome
+Disp "PROPERTIES:
+1->L
+For(I,1,40
+	If |LBOARD(I:Then
+		If V=[B](|LBOARD(I),9:Then
+			Disp sub(Str1,16I-15,16
+			L+1->L
+		End
+	End
+	If L=7 or I=40:Then
+		Pause 
+		ClrHome
+		1->L
+	End
+End
+Goto O
+Lbl PR
+ClrHome
+Disp "SEARCH
+Asm(prgmAMNALPHA
+Input "PROPERTIES:     ",Str2//user inputs part of a property name
+//for now, assume they start at the beginning of the name
+1+(inString(Str1,Str2)-1)/16->V//change spot in string 1 where the searched property begins into a number 1-40 corresponding to a space
+If V and |LBOARD((V-1)/16+1:Then
+	ClrDraw
+	Text(0,0,sub(Str1,V,16//display the space on the board that the search found
+	|LBOARD(V->V//change the spot into a row of [B] if it's a property
+	If V:Then//if the space is a property
+		If sum(V={1,2,4,5,6,7,9,10,12,13,14,15,16,17,19,20,22,23,24,25,27,28:Then//regular property
+			Text(7,6,"RENT: ",[B](V,2
+			Text(14,6,"WITH COMPLETE SET: ",2[B](V,2
+			Text(21,6,"WITH 1 HOUSE: ",[B](V,3
+			Text(28,6,"WITH 2 HOUSES: ",[B](V,4
+			Text(35,6,"WITH 3 HOUSES: ",[B](V,5
+			Text(42,6,"WITH 4 HOUSES: ",[B](V,6
+			Text(49,6,"WITH HOTEL: ",[B](V,7
+			If [B](V,9:Then//if owned
+				If fPart([B](V,9:Then//mortgaged
+					Text(56,0,"*
+				Else:
+					Text(7([B](V,8)+2),0,"*
+					//indicate development
+				End
+			End
+		End
+		If sum(V={3,11,18,26:Then//railroad
+			Text(7,6,"RENT: 25
+			Text(28,6,"2 RRS OWNED: 50
+			Text(28,6,"3 RRS OWNED: 100
+			Text(28,6,"4 RRS OWNED: 200
+			If [B](V,9:Then//if owned
+				If fPart([B](V,9:Then//mortgaged
+					Text(56,0,"*
+				Else:
+					0->T//count the number of rrs owned by the railroads owner
+					If iPart([B](V,9))=iPart([B](3,9
+						T+1->T
+					If iPart([B](V,9))=iPart([B](11,9
+						T+1->T
+					If iPart([B](V,9))=iPart([B](18,9
+						T+1->T
+					If iPart([B](V,9))=iPart([B](26,9
+						T+1->T
+					Text(7([B](V,9)+1),0,"*
+				End
+			End
+		End
+		If sum(V={8,21:Then//utility
+			Text(14,6,"RENT IF 1 UTIL
+			Text(21,6,"OWNED: 4X DICE
+			Text(28,6,"RENT IF BOTH
+			Text(35,6,"OWNED: 10X DICE
+			If [B](V,9:Then//if owned
+				If fPart([B](V,9:Then//mortgaged
+					Text(56,0,"*
+				Else:
+					If iPart([B](8,9)=iPart([B](21,9):Then//if utilities owned by the same person
+						Text(28,0,"*
+						//indicate 10x dice
+					Else//owner does not own other utility
+						Text(14,0,"*
+						//indicate 4x dice
+					End
+				End
+			End
+		End
+		Text(56,6,"MORTGAGE VALUE: ",.5[B](V,1
+		Text(0,55,"OWNED:
+		If [B](V,9:Then
+			Text(7,55,sub(Str3,10(iPart([B](V,9))-1)+2,10//display the owner's name
+		Else
+			Text(7,55,"NO
+		End
+	End
+	Pause 
+Else//if input not present in str1 
+	ClrHome
+	Pause "NO RESULTS FOUND
+End
+Goto O
+Lbl R
+Return
